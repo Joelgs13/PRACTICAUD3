@@ -2,6 +2,8 @@ import java.io.*;
 import java.sql.*;
 import java.util.Scanner;
 
+import dao.DaoCrearTablaDocker;
+
 public class MenuOlimpiadas {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -22,7 +24,7 @@ public class MenuOlimpiadas {
 
             switch (opcion) {
                 case 1:
-                    crearBBDD(scanner);
+                    DaoCrearTablaDocker.crearLaBBDD();
                     break;
                 case 6:
                     System.out.println("Saliendo...");
@@ -152,4 +154,6 @@ public class MenuOlimpiadas {
             e.printStackTrace();
         }
     }
+
+    
 }

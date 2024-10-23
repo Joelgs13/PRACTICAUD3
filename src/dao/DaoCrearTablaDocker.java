@@ -1,29 +1,35 @@
+package dao;
+import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Scanner;
 
-public class CrearTablaDocker {
-    public static void main(String[] args) {
-        // Datos de conexión
-        String url = "jdbc:mysql://localhost:33066/olimpiadas"; // Cambia la URL si es necesario
-        String usuario = "prof";
-        String contraseña = "1234";
 
+import bbdd.ConexionBBDD;
+
+public class DaoCrearTablaDocker {
+    private static Connection connection;
+    public static void crearLaBBDD() {
+        
+        Scanner sc = new Scanner(System.in);
+        System.out.println("dame la ruta del CSV:");
+        String ruta = sc.nextLine();
+        File archivoCSV=new File(ruta);
+
+        
+		
         try {
-            // Conexión a la base de datos
-            Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost:33066/", usuario, contraseña);
+            ConexionBBDD conexion = new ConexionBBDD(); // Crear instancia de la clase
+            connection = conexion.getConnection();
 
-            // Crear un Statement para ejecutar las consultas SQL
-            Statement statement = conexion.createStatement();
-
-            // 1. Crear el esquema primero
-            String sqlCrearEsquema = "CREATE SCHEMA IF NOT EXISTS `olimpiadas` DEFAULT CHARACTER SET latin1 COLLATE latin1_spanish_ci;";
-            statement.executeUpdate(sqlCrearEsquema);
+            String sqlCrearEsquema = "DROP SCHEMA IF EXISTS `olimpiadas` ;\\r\\nCREATE SCHEMA IF NOT EXISTS `olimpiadas` DEFAULT CHARACTER SET latin1 COLLATE latin1_spanish_ci;";
+            Update(sqlCrearEsquema);
             System.out.println("Esquema creado.");
 
             // 2. Cambiar el esquema actual a 'olimpiadas'
             String sqlUsarEsquema = "USE `olimpiadas`;";
-            statement.executeUpdate(sqlUsarEsquema);
+            Update(sqlUsarEsquema);
             System.out.println("Usando el esquema olimpiadas.");
 
             // 3. Crear tabla `Deporte`
@@ -33,15 +39,17 @@ public class CrearTablaDocker {
                 "`nombre` varchar(100) NOT NULL, " +
                 "PRIMARY KEY (`id_deporte`)" +
                 ") ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
-            statement.executeUpdate(sqlCrearTablaDeporte);
+            Update(sqlCrearTablaDeporte);
             System.out.println("Tabla 'Deporte' creada.");
 
+            /*
             // 4. Insertar valores en la tabla `Deporte`
             String sqlInsertarDeporte = 
                 "INSERT INTO `Deporte` (`id_deporte`, `nombre`) " +
                 "VALUES (1, 'Basketball'), (2, 'Judo'), (3, 'Football');";
             statement.executeUpdate(sqlInsertarDeporte);
             System.out.println("Valores insertados en 'Deporte'.");
+            */
 
             // 5. Crear tabla `Deportista`
             String sqlCrearTablaDeportista = 
@@ -53,16 +61,16 @@ public class CrearTablaDocker {
                 "`altura` int(11) DEFAULT NULL, " +
                 "PRIMARY KEY (`id_deportista`)" +
                 ") ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
-            statement.executeUpdate(sqlCrearTablaDeportista);
+            Update(sqlCrearTablaDeportista);
             System.out.println("Tabla 'Deportista' creada.");
-
+            /*
             // 6. Insertar valores en la tabla `Deportista`
             String sqlInsertarDeportista = 
                 "INSERT INTO `Deportista` (`id_deportista`, `nombre`, `sexo`, `peso`, `altura`) " +
                 "VALUES (1, 'A Dijiang', 'M', 80, 180), (2, 'A Lamusi', 'M', 60, 170);";
-            statement.executeUpdate(sqlInsertarDeportista);
+            Update(sqlInsertarDeportista);
             System.out.println("Valores insertados en 'Deportista'.");
-
+            */
             // 7. Crear tabla `Equipo`
             String sqlCrearTablaEquipo = 
                 "CREATE TABLE IF NOT EXISTS `Equipo` (" +
@@ -71,16 +79,16 @@ public class CrearTablaDocker {
                 "`iniciales` varchar(3) NOT NULL, " +
                 "PRIMARY KEY (`id_equipo`)" +
                 ") ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
-            statement.executeUpdate(sqlCrearTablaEquipo);
+            Update(sqlCrearTablaEquipo);
             System.out.println("Tabla 'Equipo' creada.");
-
+            /* 
             // 8. Insertar valores en la tabla `Equipo`
             String sqlInsertarEquipo = 
                 "INSERT INTO `Equipo` (`id_equipo`, `nombre`, `iniciales`) " +
                 "VALUES (1, 'China', 'CHN'), (2, 'Denmark', 'DEN');";
-            statement.executeUpdate(sqlInsertarEquipo);
+            Update(sqlInsertarEquipo);
             System.out.println("Valores insertados en 'Equipo'.");
-
+            */
             // 9. Crear tabla `Olimpiada`
             String sqlCrearTablaOlimpiada = 
                 "CREATE TABLE IF NOT EXISTS `Olimpiada` (" +
@@ -91,18 +99,18 @@ public class CrearTablaDocker {
                 "`ciudad` varchar(50) NOT NULL, " +
                 "PRIMARY KEY (`id_olimpiada`)" +
                 ") ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
-            statement.executeUpdate(sqlCrearTablaOlimpiada);
+            Update(sqlCrearTablaOlimpiada);
             System.out.println("Tabla 'Olimpiada' creada.");
-
+            /*
             // 10. Insertar valores en la tabla `Olimpiada`
             String sqlInsertarOlimpiada = 
                 "INSERT INTO `Olimpiada` (`id_olimpiada`, `nombre`, `anio`, `temporada`, `ciudad`) " +
                 "VALUES (1, '1992 Summer', 1992, 'Summer', 'Barcelona'), " +
                 "(2, '2012 Summer', 2012, 'Summer', 'London'), " +
                 "(3, '1920 Summer', 1920, 'Summer', 'Antwerpen');";
-            statement.executeUpdate(sqlInsertarOlimpiada);
+            Update(sqlInsertarOlimpiada);
             System.out.println("Valores insertados en 'Olimpiada'.");
-
+            */
             // 11. Crear tabla `Evento`
             String sqlCrearTablaEvento = 
                 "CREATE TABLE IF NOT EXISTS `Evento` (" +
@@ -114,9 +122,9 @@ public class CrearTablaDocker {
                 "CONSTRAINT `FK_Evento_Deporte` FOREIGN KEY (`id_deporte`) REFERENCES `Deporte` (`id_deporte`), " +
                 "CONSTRAINT `FK_Evento_Olimpiada` FOREIGN KEY (`id_olimpiada`) REFERENCES `Olimpiada` (`id_olimpiada`)" +
                 ") ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
-            statement.executeUpdate(sqlCrearTablaEvento);
+            Update(sqlCrearTablaEvento);
             System.out.println("Tabla 'Evento' creada.");
-
+            
             // 12. Crear tabla `Participacion`
             String sqlCrearTablaParticipacion = 
                 "CREATE TABLE IF NOT EXISTS `Participacion` (" +
@@ -130,15 +138,16 @@ public class CrearTablaDocker {
                 "CONSTRAINT `FK_Participacion_Equipo` FOREIGN KEY (`id_equipo`) REFERENCES `Equipo` (`id_equipo`), " +
                 "CONSTRAINT `FK_Participacion_Evento` FOREIGN KEY (`id_evento`) REFERENCES `Evento` (`id_evento`)" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
-            statement.executeUpdate(sqlCrearTablaParticipacion);
+            Update(sqlCrearTablaParticipacion);
             System.out.println("Tabla 'Participacion' creada.");
-
-            // Cerrar la conexión
-            statement.close();
-            conexion.close();
+            conexion.closeConnection();
             System.out.println("Tablas creadas e insertadas correctamente en Docker MySQL");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+    static void Update(String sentencia) throws SQLException {
+		PreparedStatement pstmt = connection.prepareStatement(sentencia);
+		pstmt.executeUpdate();
+	}
 }
