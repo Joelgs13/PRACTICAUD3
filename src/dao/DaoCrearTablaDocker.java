@@ -11,12 +11,11 @@ import bbdd.ConexionBBDD;
 public class DaoCrearTablaDocker {
     private static Connection connection;
     public static void crearLaBBDD() {
-        
+
         Scanner sc = new Scanner(System.in);
         System.out.println("dame la ruta del CSV:");
         String ruta = sc.nextLine();
         File archivoCSV=new File(ruta);
-
         
 		
         try {
@@ -150,9 +149,25 @@ public class DaoCrearTablaDocker {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        try {
+            ConexionBBDD conexion = new ConexionBBDD();
+            connection = conexion.getConnection();
+            
+            // Existing table creation code here...
+
+            // After creating tables, insert data from CSV
+            insertDataFromCSV("athlete_events-sort.csv");
+            conexion.closeConnection();
+            System.out.println("Datos insertados correctamente.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     static void Update(String sentencia) throws SQLException {
 		PreparedStatement pstmt = connection.prepareStatement(sentencia);
 		pstmt.executeUpdate();
 	}
+    static void insertDataFromCSV(String archivo) {
+        
+    }
 }

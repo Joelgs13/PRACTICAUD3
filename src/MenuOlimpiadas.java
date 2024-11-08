@@ -2,6 +2,7 @@ import java.io.*;
 import java.sql.*;
 import java.util.Scanner;
 
+import bbdd.ConexionBBDD;
 import dao.DaoCrearTablaDocker;
 
 public class MenuOlimpiadas {
@@ -25,6 +26,19 @@ public class MenuOlimpiadas {
             switch (opcion) {
                 case 1:
                     DaoCrearTablaDocker.crearLaBBDD();
+                     try {
+                        ConexionBBDD conexion = new ConexionBBDD();
+                        connection = conexion.getConnection();
+                        
+                        // Existing table creation code here...
+
+                        // After creating tables, insert data from CSV
+                        insertDataFromCSV("athlete_events-sort.csv");
+                        conexion.closeConnection();
+                        System.out.println("Datos insertados correctamente.");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case 6:
                     System.out.println("Saliendo...");
