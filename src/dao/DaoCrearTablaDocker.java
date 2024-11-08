@@ -22,11 +22,16 @@ public class DaoCrearTablaDocker {
         try {
             ConexionBBDD conexion = new ConexionBBDD(); // Crear instancia de la clase
             connection = conexion.getConnection();
-
-            String sqlCrearEsquema = "DROP SCHEMA IF EXISTS `olimpiadas` ;\\r\\nCREATE SCHEMA IF NOT EXISTS `olimpiadas` DEFAULT CHARACTER SET latin1 COLLATE latin1_spanish_ci;";
+        
+            // Separate the schema drop and creation into two statements
+            String sqlDropEsquema = "DROP SCHEMA IF EXISTS `olimpiadas`;";
+            Update(sqlDropEsquema);
+            System.out.println("Esquema eliminado si existía.");
+        
+            String sqlCrearEsquema = "CREATE SCHEMA IF NOT EXISTS `olimpiadas` DEFAULT CHARACTER SET latin1 COLLATE latin1_spanish_ci;";
             Update(sqlCrearEsquema);
             System.out.println("Esquema creado.");
-
+        
             // 2. Cambiar el esquema actual a 'olimpiadas'
             String sqlUsarEsquema = "USE `olimpiadas`;";
             Update(sqlUsarEsquema);
