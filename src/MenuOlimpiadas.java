@@ -7,6 +7,7 @@ import dao.DaoCrearTablaDocker;
 
 public class MenuOlimpiadas {
     public static void main(String[] args) {
+        ConexionBBDD conexion = new ConexionBBDD();         
         Scanner scanner = new Scanner(System.in);
         int opcion;
 
@@ -14,31 +15,21 @@ public class MenuOlimpiadas {
             // Mostrar el menú
             System.out.println("Menú:");
             System.out.println("1. Crear BBDD MySQL");
-            System.out.println("2. Opción 2 (Pendiente)");
-            System.out.println("3. Opción 3 (Pendiente)");
-            System.out.println("4. Opción 4 (Pendiente)");
-            System.out.println("5. Opción 5 (Pendiente)");
-            System.out.println("6. Salir");
+            System.out.println("2. Listado de deportistas en diferentes deportes");
+            System.out.println("3. Listado de deportistas participantes");
+            System.out.println("4. Modificar medalla deportista");
+            System.out.println("5. Añadir deportista/participación");
+            System.out.println("6. Eliminar participación");
+            System.out.println("0. Terminar programa");
             System.out.print("Seleccione una opción: ");
             opcion = scanner.nextInt();
             scanner.nextLine(); // Limpiar el buffer
 
             switch (opcion) {
                 case 1:
-                    DaoCrearTablaDocker.crearLaBBDD();
-                     try {
-                        ConexionBBDD conexion = new ConexionBBDD();
-                        connection = conexion.getConnection();
-                        
-                        // Existing table creation code here...
-
-                        // After creating tables, insert data from CSV
-                        insertDataFromCSV("athlete_events-sort.csv");
-                        conexion.closeConnection();
-                        System.out.println("Datos insertados correctamente.");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    System.out.println("Dime la ruta del archivo csv");
+                    String path=scanner.nextLine();
+                    DaoCrearTablaDocker.crearLaBBDD(path);
                     break;
                 case 6:
                     System.out.println("Saliendo...");

@@ -1,27 +1,24 @@
 package dao;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Scanner;
 
 
 import bbdd.ConexionBBDD;
 
 public class DaoCrearTablaDocker {
     private static Connection connection;
-    public static void crearLaBBDD() {
-
-        Scanner sc = new Scanner(System.in);
-        System.out.println("dame la ruta del CSV:");
-        String ruta = sc.nextLine();
-        File archivoCSV=new File(ruta);
+    public static void crearLaBBDD(String pathString) {
         
 		
         try {
-            ConexionBBDD conexion = new ConexionBBDD(); // Crear instancia de la clase
-            connection = conexion.getConnection();
-        
+            connection = ConexionBBDD.getConnection();
+            File CSV=new File(pathString);
             // Separate the schema drop and creation into two statements
             String sqlDropEsquema = "DROP SCHEMA IF EXISTS `olimpiadas`;";
             Update(sqlDropEsquema);
@@ -144,30 +141,69 @@ public class DaoCrearTablaDocker {
                 ") ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
             Update(sqlCrearTablaParticipacion);
             System.out.println("Tabla 'Participacion' creada.");
-            conexion.closeConnection();
             System.out.println("Tablas creadas e insertadas correctamente en Docker MySQL");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            ConexionBBDD conexion = new ConexionBBDD();
-            connection = conexion.getConnection();
-            
-            // Existing table creation code here...
-
-            // After creating tables, insert data from CSV
-            insertDataFromCSV("athlete_events-sort.csv");
-            conexion.closeConnection();
-            System.out.println("Datos insertados correctamente.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            if(CSV.isFile()&&pathString.endsWith(".csv")) {
+                //es csv
+				try(BufferedReader br=new BufferedReader(new FileReader(CSV))){
+                    //System.out.println("LLEGUE.");
+					String linea=br.readLine();
+					if(linea.equals("ID,Name,Sex,Age,Height,Weight,Team,NOC,Games,Year,Season,City,Sport,Event,Medal")) {
+                        System.out.println("linea es correcta");
+						linea=br.readLine();
+						while(linea!=null) {
+							String leido[]=linea.split(",");
+							if(leido[3].equals("NA")){leido[3]="-1";}
+							if(leido[4].equals("NA")){leido[4]="-1";}
+							if(leido[5].equals("NA")){leido[5]="-1";}
+							leido[5]=Math.round(Float.parseFloat(leido[5]))+"";
+                            System.out.println("estoy llegando aqui");
+							if(DaoDeportista.conseguirIdDeportista(leido[1], leido[2].charAt(0), Float.parseFloat(leido[5]), Integer.parseInt(leido[4]))==null){
+								DaoDeportista.aniadirDeportista(leido[1], leido[2].charAt(0), Float.parseFloat(leido[5]), Integer.parseInt(leido[4]));
+							}
+							if(DaoDeporte.conseguirIdDeporte(leido[12])==null) {
+								DaoDeporte.aniadirDeporte(leido[12]);
+							}
+							if(DaoEquipo.conseguirIdEquipo(leido[6], leido[7])==null) {
+								DaoEquipo.aniadirEquipo(leido[6], leido[7]);
+							}
+							if(DaoOlimpiada.conseguirIdOlimpiada(leido[8],Integer.parseInt(leido[9]), leido[10], leido[11])==null) {
+								DaoOlimpiada.aniadirOlimpiada(leido[8],Integer.parseInt(leido[9]), leido[10], leido[11]);
+							}
+							if(DaoEvento.conseguirIdEvento(leido[13], Integer.parseInt(DaoOlimpiada.conseguirIdOlimpiada(leido[8],Integer.parseInt(leido[9]), leido[10], leido[11])),
+									Integer.parseInt(DaoDeporte.conseguirIdDeporte(leido[12])))==null){
+								DaoEvento.aniadirEvento(leido[13], Integer.parseInt(DaoOlimpiada.conseguirIdOlimpiada(leido[8],Integer.parseInt(leido[9]), leido[10], leido[11])),Integer.parseInt(DaoDeporte.conseguirIdDeporte(leido[12])));
+							}
+							if(!DaoParticipacion.existeIdParticipacion(Integer.parseInt(DaoDeportista.conseguirIdDeportista(leido[1], leido[2].charAt(0), Float.parseFloat(leido[5]),Integer.parseInt(leido[4]))),
+									Integer.parseInt(DaoEvento.conseguirIdEvento(leido[13], 
+											Integer.parseInt(DaoOlimpiada.conseguirIdOlimpiada(leido[8],Integer.parseInt(leido[9]), leido[10], leido[11])),
+											Integer.parseInt(DaoDeporte.conseguirIdDeporte(leido[12])))))) {
+								DaoParticipacion.aniadirParticipacion(Integer.parseInt(DaoDeportista.conseguirIdDeportista(leido[1], leido[2].charAt(0), Float.parseFloat(leido[5]), 
+										Integer.parseInt(leido[4]))),Integer.parseInt(DaoEvento.conseguirIdEvento(leido[13], 
+												Integer.parseInt(DaoOlimpiada.conseguirIdOlimpiada(leido[8],Integer.parseInt(leido[9]), leido[10], leido[11])),
+												Integer.parseInt(DaoDeporte.conseguirIdDeporte(leido[12])))),
+										Integer.parseInt(DaoEquipo.conseguirIdEquipo(leido[6], leido[7])), Integer.parseInt(leido[3]), leido[14]);
+							}
+							linea=br.readLine();
+						}
+						System.out.println("La carga de la información se ha realizado correctamente");
+					} else {
+                        System.out.println("linea NO ES CORRECTA");
+                    }
+				} catch (FileNotFoundException e) {
+					System.out.println("El archivo csv no existe");
+				} catch (IOException e) {
+					System.out.println("Ha ocurrido algún error en la carga");
+				}
+			}
+			else {
+				System.out.println("El archivo csv no existe");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     }
     static void Update(String sentencia) throws SQLException {
 		PreparedStatement pstmt = connection.prepareStatement(sentencia);
 		pstmt.executeUpdate();
 	}
-    static void insertDataFromCSV(String archivo) {
-        
-    }
 }
