@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import bbdd.ConexionBBDD;
+import model.ModeloDeporte;
 
 public class DaoDeporte {
     private static Connection connection;
@@ -69,4 +70,26 @@ public class DaoDeporte {
 		}
 		return null;
 	}
+
+	public static ModeloDeporte createDeporteModel(int id) {
+    connection = ConexionBBDD.getConnection();
+    String consulta = "SELECT nombre FROM Deporte WHERE id_deporte=?";
+    
+    try (PreparedStatement pstmt = connection.prepareStatement(consulta)) {
+        pstmt.setInt(1, id);
+        ResultSet rs = pstmt.executeQuery();
+
+        if (rs.next()) {
+            connection.commit();
+            String nombreDeporte = rs.getString("nombre");
+            return new ModeloDeporte(nombreDeporte);
+        }
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return null;
+}
+
 }

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 import bbdd.ConexionBBDD;
+import model.ModeloEquipo;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,4 +47,28 @@ public class DaoEquipo {
 		}
 		return null;
 	}
+
+	public static ModeloEquipo createEquipoModel(int id) {
+		connection = ConexionBBDD.getConnection();
+		String consulta = "SELECT nombre, iniciales FROM Equipo WHERE id_equipo=?";
+
+		try (PreparedStatement pstmt = connection.prepareStatement(consulta)) {
+			pstmt.setInt(1, id);
+			ResultSet rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				connection.commit();
+				String nombre = rs.getString("nombre");
+				String iniciales = rs.getString("iniciales");
+
+				return new ModeloEquipo(nombre, iniciales);
+			}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+		return null;
+	}
+
 }

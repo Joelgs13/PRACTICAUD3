@@ -3,9 +3,43 @@ package dao;
 import java.sql.*;
 
 import bbdd.ConexionBBDD;
+import model.ModeloDeportista;
 
 public class DaoDeportista {
     private static Connection connection;
+
+public static ModeloDeportista createDeportistaModel(String id) {
+    // Conexión a la base de datos
+    connection = ConexionBBDD.getConnection();
+    String consultaSQL = "SELECT nombre, sexo, peso, altura FROM Deportista WHERE id_deportista = ?";
+    
+    try (PreparedStatement pstmt = connection.prepareStatement(consultaSQL)) {
+		//System.out.println("prueba");
+		
+		pstmt.setString(1, id); // Asigna el ID del deportista a la consulta
+        ResultSet resultado = pstmt.executeQuery();
+
+		//System.out.println("prueba");
+
+        if (resultado.next()) {
+            connection.commit(); // Confirma la transacción si se encuentra un resultado
+            String nombre = resultado.getString("nombre");
+            char sexo = resultado.getString("sexo").charAt(0);
+            int altura = resultado.getInt("altura");
+            int peso = resultado.getInt("peso");
+            
+            return new ModeloDeportista(nombre, sexo, altura, peso);
+        } else {
+            System.out.println("No se encontró ningún deportista con el ID: " + id);
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al obtener el modelo del deportista: " + e.getMessage());
+    }
+
+    // Retorna null si no se encontró el deportista o ocurrió una excepción
+    return null;
+}
+
 
     public static void insertDeportista(String nombre, String sexo, int edad) throws SQLException {
         String sql = "INSERT INTO `Deportista` (`nombre`, `sexo`, `edad`) VALUES (?, ?, ?)";

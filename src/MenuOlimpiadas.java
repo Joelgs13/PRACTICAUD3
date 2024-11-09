@@ -1,9 +1,14 @@
 import java.io.*;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import bbdd.ConexionBBDD;
 import dao.DaoCrearTablaDocker;
+import dao.DaoDeportista;
+import dao.DaoParticipacion;
+import model.ModeloParticipacion;
 
 public class MenuOlimpiadas {
     public static void main(String[] args) {
@@ -30,6 +35,12 @@ public class MenuOlimpiadas {
                     System.out.println("Dime la ruta del archivo csv");
                     String path=scanner.nextLine();
                     DaoCrearTablaDocker.crearLaBBDD(path);
+                    break;
+                case 2:
+                    ListDifferentSportsDeportists();
+
+
+
                     break;
                 case 6:
                     System.out.println("Saliendo...");
@@ -159,6 +170,33 @@ public class MenuOlimpiadas {
             e.printStackTrace();
         }
     }
+
+    public static void ListDifferentSportsDeportists() {
+        int i = 10;
+        System.out.println(DaoDeportista.createDeportistaModel(i+"")+":");
+			ArrayList<ModeloParticipacion>lst=listaParticipaciones(i);
+			for(ModeloParticipacion part:lst) {
+				System.out.println(part.getEvento().getDeporte().getNombreDeporte()+","+
+						part.getEdad()+","+part.getEvento().getNombreEvento()+","+
+						part.getEquipo().getNombreEquipo()+","+part.getEvento().getOlimpiada().getNombreOlimpiada()+","+
+						part.getMedalla());
+			}
+		i++;
+    }
+
+    public static ArrayList<ModeloParticipacion> listaParticipaciones(int idDeportista) {
+    ArrayList<ModeloParticipacion> listaParticipaciones = new ArrayList<>();
+
+    // Obtener lista de IDs de eventos en los que ha participado el deportista
+    List<String> idsEventos = DaoParticipacion.getIdEvento(idDeportista);
+    for (String idEvento : idsEventos) {
+        int eventoId = Integer.parseInt(idEvento);
+        ModeloParticipacion participacion = DaoParticipacion.crearModeloParticipacion(idDeportista, eventoId);
+        listaParticipaciones.add(participacion);
+    }
+
+    return listaParticipaciones;
+}
 
     
 }

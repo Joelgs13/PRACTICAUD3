@@ -9,7 +9,7 @@ public class ConexionBBDD {
     private static Connection connection;
     
     // Parámetros de conexión
-    private static final String DB_URL = "jdbc:mysql://localhost:33066";
+    private static final String DB_URL = "jdbc:mysql://localhost:33066/olimpiadas";
     private static final String USER = "joel";
     private static final String PASSWORD = "1234";
 
