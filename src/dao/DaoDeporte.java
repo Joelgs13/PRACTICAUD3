@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import bbdd.ConexionBBDD;
 import model.ModeloDeporte;
@@ -91,5 +94,35 @@ public class DaoDeporte {
     
     return null;
 }
+
+	public static ArrayList<ModeloDeporte> listSportByOlimpiada(int idOlimpiada) {
+    ArrayList<ModeloDeporte> lst = new ArrayList<>();
+    Set<ModeloDeporte> deportesSet = new HashSet<>();  // Usar Set para evitar duplicados
+
+    String select = "SELECT id_deporte FROM Evento WHERE id_olimpiada=?";
+    
+    // Utilizamos try-with-resources para manejar recursos automáticamente
+    try (Connection con = ConexionBBDD.getConnection();
+         PreparedStatement pstmt = con.prepareStatement(select)) {
+        
+        pstmt.setInt(1, idOlimpiada);
+        
+        try (ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                ModeloDeporte deporte = DaoDeporte.createDeporteModel(rs.getInt("id_deporte"));
+                // Añadimos al conjunto, el conjunto se asegura de no tener duplicados
+                deportesSet.add(deporte);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    // Convertimos el conjunto a una lista para devolverla
+    lst.addAll(deportesSet);
+    return lst;
+}
+
+
 
 }
