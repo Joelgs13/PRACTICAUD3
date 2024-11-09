@@ -33,6 +33,22 @@ public class DaoParticipacion {
 		return false;
 	}
 
+    public static void editMedal(int idDeportista,int idEvento,String nuevaMedalla) {
+		connection=ConexionBBDD.getConnection();
+		String update="UPDATE Participacion SET medalla=? WHERE id_deportista=? AND id_evento=?";
+		try {
+			PreparedStatement pstmt;
+			pstmt=connection.prepareStatement(update);
+			pstmt.setString(1,nuevaMedalla);
+			pstmt.setInt(2,idDeportista);
+			pstmt.setInt(3, idEvento);
+			pstmt.executeUpdate();
+			connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static ArrayList<String> darIdDeportista(int idEvento) {
 		connection=ConexionBBDD.getConnection();
 		String select="SELECT id_deportista FROM Participacion WHERE id_evento=?";

@@ -54,6 +54,28 @@ public class DaoEvento {
 		return lst;	
 	}
 
+	public static ArrayList<ModeloEvento> listaModelosPorId(ArrayList<String>lstId){
+		connection=ConexionBBDD.getConnection();
+		ArrayList<ModeloEvento>lst=new ArrayList<ModeloEvento>();
+		String select="SELECT nombre,id_deporte,id_olimpiada FROM Evento where id_evento=?";
+		try {
+			PreparedStatement pstmt;
+			pstmt=connection.prepareStatement(select);
+			for(String id:lstId) {
+				pstmt.setInt(1,Integer.parseInt(id));
+				ResultSet rs = pstmt.executeQuery();
+				if(rs.next()) {
+					connection.commit();
+					ModeloEvento evento=new ModeloEvento(rs.getString("nombre"),DaoDeporte.createDeporteModel(rs.getInt("id_deporte")),DaoOlimpiada.createOlimpiadaModel(rs.getInt("id_olimpiada")));
+					lst.add(evento);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lst;
+	}
+
 public static ModeloEvento createById(int id) {
     connection = ConexionBBDD.getConnection();
     String consulta = "SELECT nombre, id_deporte, id_olimpiada FROM Evento WHERE id_evento=?";

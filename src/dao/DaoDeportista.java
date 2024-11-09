@@ -1,6 +1,7 @@
 package dao;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 import bbdd.ConexionBBDD;
 import model.ModeloDeportista;
@@ -40,6 +41,25 @@ public static ModeloDeportista createDeportistaModel(String id) {
     return null;
 }
 
+
+    public static ArrayList<ModeloDeportista> findDeportistaName(String cadena){
+		connection=ConexionBBDD.getConnection();
+		ArrayList<ModeloDeportista>lst=new ArrayList<ModeloDeportista>();
+		String select="SELECT id_deportista FROM Deportista WHERE nombre LIKE ?";
+		try {
+			PreparedStatement pstmt;
+			pstmt=connection.prepareStatement(select);
+			pstmt.setString(1,"%"+cadena+"%");
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				connection.commit();
+				lst.add(DaoDeportista.createDeportistaModel(rs.getInt("id_deportista")+""));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lst;	
+	}
 
     public static void insertDeportista(String nombre, String sexo, int edad) throws SQLException {
         String sql = "INSERT INTO `Deportista` (`nombre`, `sexo`, `edad`) VALUES (?, ?, ?)";
