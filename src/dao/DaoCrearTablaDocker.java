@@ -13,6 +13,11 @@ import bbdd.ConexionBBDD;
 
 public class DaoCrearTablaDocker {
     private static Connection connection;
+    
+    /** 
+     * metodo para crear la BBDD
+     * @param pathString
+     */
     public static void crearLaBBDD(String pathString) {
         
 		
@@ -202,6 +207,12 @@ public class DaoCrearTablaDocker {
 			e.printStackTrace();
 		}
     }
+    
+    /** 
+     * metodo update
+     * @param sentencia
+     * @throws SQLException
+     */
     static void Update(String sentencia) throws SQLException {
 		PreparedStatement pstmt = connection.prepareStatement(sentencia);
 		pstmt.executeUpdate();

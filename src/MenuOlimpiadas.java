@@ -9,6 +9,10 @@ import dao.*;
 import model.*;
 
 public class MenuOlimpiadas {
+    /**
+     * main
+     * @param args
+     */
     public static void main(String[] args) {
         ConexionBBDD conexion = new ConexionBBDD();
         Scanner scanner = new Scanner(System.in);
@@ -549,7 +553,11 @@ public class MenuOlimpiadas {
 
         scanner.close();
     }
-
+    /**
+     * crear tablas
+     * @param statement
+     * @throws SQLException
+     */
     public static void crearTablas(Statement statement) throws SQLException {
         String sqlCrearTablaDeporte = "CREATE TABLE IF NOT EXISTS `Deporte` (" +
                 "`id_deporte` int(11) NOT NULL AUTO_INCREMENT, " +
@@ -612,7 +620,11 @@ public class MenuOlimpiadas {
                 ") ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_spanish_ci;";
         statement.executeUpdate(sqlCrearTablaParticipacion);
     }
-
+    /**
+     * cargar datos del csv
+     * @param conexion
+     * @param archivoCSV
+     */
     public static void cargarDatosDesdeCSV(Connection conexion, File archivoCSV) {
         String sqlInsertarDeportista = "INSERT INTO Deportista (nombre, sexo, peso, altura) VALUES (?, ?, ?, ?)";
         String sqlInsertarEquipo = "INSERT INTO Equipo (nombre, iniciales) VALUES (?, ?)";
@@ -661,6 +673,9 @@ public class MenuOlimpiadas {
         }
     }
 
+    /**
+     * diferentes deportes
+     */
     public static void ListDifferentSportsDeportists() {
         int i = 10;
         System.out.println(DaoDeportista.createDeportistaModel(i + "") + ":");
@@ -674,7 +689,11 @@ public class MenuOlimpiadas {
         }
         i++;
     }
-
+    /**
+     * lista de participaciones
+     * @param idDeportista
+     * @return
+     */
     public static ArrayList<ModeloParticipacion> listaParticipaciones(int idDeportista) {
         ArrayList<ModeloParticipacion> listaParticipaciones = new ArrayList<>();
 
