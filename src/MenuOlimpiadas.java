@@ -236,14 +236,316 @@ public class MenuOlimpiadas {
                     }
 
                     break;
+                case 5:
+                    int idDeportista = 0;
+                    resp = 0;
+                    ModeloDeportista deportista;
+
+                    System.out.println("\n==============================");
+                    System.out.println("    Buscar Deportista");
+                    System.out.println("==============================");
+                    System.out.print("Dime el nombre a buscar: ");
+                    nombre = scanner.nextLine();
+                    lstDeportistas = DaoDeportista.findDeportistaName(nombre);
+
+                    if (lstDeportistas.size() > 0) {
+                        do {
+                            System.out.println("\n==============================");
+                            System.out.println("    Elige al Deportista");
+                            System.out.println("==============================");
+                            for (int i = 0; i < lstDeportistas.size(); i++) {
+                                System.out
+                                        .println("   " + (i + 1) + ": " + lstDeportistas.get(i).getNombreDeportista());
+                            }
+                            System.out.print("Selecciona el número: ");
+                            resp = scanner.nextInt();
+                            scanner.nextLine();
+                        } while (resp < 1 || resp > lstDeportistas.size());
+                        deportista = lstDeportistas.get(resp - 1);
+                    } else {
+                        System.out.println("\nNo hay ningún deportista con ese nombre. Se creará uno nuevo.");
+                        System.out.print("Dime el nombre completo: ");
+                        nombre = scanner.nextLine();
+
+                        int sexo = 0;
+                        do {
+                            System.out.println("\n==============================");
+                            System.out.println("    Indica el Sexo");
+                            System.out.println("==============================");
+                            System.out.println("1. Masculino (M)");
+                            System.out.println("2. Femenino (F)");
+                            System.out.print("Selecciona el número: ");
+                            sexo = scanner.nextInt();
+                            scanner.nextLine();
+                        } while (sexo != 1 && sexo != 2);
+
+                        System.out.print("¿Cuánto pesa? ");
+                        int peso = Math.round(scanner.nextFloat());
+                        scanner.nextLine();
+
+                        System.out.print("¿Cuánto mide (en cm)? ");
+                        int altura = scanner.nextInt();
+                        scanner.nextLine();
+
+                        if (sexo == 1) {
+                            DaoDeportista.aniadirDeportista(nombre, 'M', peso, altura);
+                            deportista = DaoDeportista.createDeportistaModel(
+                                    DaoDeportista.conseguirIdDeportista(nombre, 'M', peso, altura));
+                        } else {
+                            DaoDeportista.aniadirDeportista(nombre, 'F', peso, altura);
+                            deportista = DaoDeportista.createDeportistaModel(
+                                    DaoDeportista.conseguirIdDeportista(nombre, 'F', peso, altura));
+                        }
+                    }
+
+                    idDeportista = Integer
+                            .parseInt(DaoDeportista.conseguirIdDeportista(deportista.getNombreDeportista(),
+                                    deportista.getSexo(), deportista.getPeso(), deportista.getAltura()));
+
+                    do {
+                        System.out.println("\n==============================");
+                        System.out.println("    Selecciona la Temporada");
+                        System.out.println("==============================");
+                        System.out.println("1. Winter");
+                        System.out.println("2. Summer");
+                        System.out.print("Selecciona el número: ");
+                        resp = scanner.nextInt();
+                        scanner.nextLine();
+                    } while (resp != 1 && resp != 2);
+
+                    lstOlimpiada = DaoOlimpiada.listaOlimpiadasPorTemporada(resp);
+
+                    do {
+                        System.out.println("\n==============================");
+                        System.out.println("    Selecciona la Edición Olímpica");
+                        System.out.println("==============================");
+                        for (int i = 0; i < lstOlimpiada.size(); i++) {
+                            System.out.println("   " + (i + 1) + ": " + lstOlimpiada.get(i).toString());
+                        }
+                        System.out.print("Selecciona el número: ");
+                        resp = scanner.nextInt();
+                        scanner.nextLine();
+                    } while (resp < 1 || resp > lstOlimpiada.size());
+
+                    temporada = lstOlimpiada.get(resp - 1).getTemporada();
+                    idOlimpiada = Integer.parseInt(DaoOlimpiada.conseguirIdOlimpiada(
+                            lstOlimpiada.get(resp - 1).getNombreOlimpiada(), lstOlimpiada.get(resp - 1).getAnio(),
+                            temporada, lstOlimpiada.get(resp - 1).getCiudad()));
+
+                    lstDeporte = DaoDeporte.listaDeportesPorOlimpiada(idOlimpiada);
+
+                    do {
+                        System.out.println("\n==============================");
+                        System.out.println("    Selecciona el Deporte");
+                        System.out.println("==============================");
+                        for (int i = 0; i < lstDeporte.size(); i++) {
+                            System.out.println("   " + (i + 1) + ": " + lstDeporte.get(i).toString());
+                        }
+                        System.out.print("Selecciona el número: ");
+                        resp = scanner.nextInt();
+                        scanner.nextLine();
+                    } while (resp < 1 || resp > lstDeporte.size());
+
+                    idDeporte = Integer
+                            .parseInt(DaoDeporte.conseguirIdDeporte(lstDeporte.get(resp - 1).getNombreDeporte()));
+                    lstEventos = DaoEvento.crearListaModelosPorDeporteYOlimpiada(idDeporte, idOlimpiada);
+
+                    do {
+                        System.out.println("\n==============================");
+                        System.out.println("    Selecciona el Evento");
+                        System.out.println("==============================");
+                        for (int i = 0; i < lstEventos.size(); i++) {
+                            System.out.println("   " + (i + 1) + ": " + lstEventos.get(i).toString());
+                        }
+                        System.out.print("Selecciona el número: ");
+                        resp = scanner.nextInt();
+                        scanner.nextLine();
+                    } while (resp < 1 || resp > lstEventos.size());
+
+                    idEvento = Integer.parseInt(DaoEvento.conseguirIdEvento(lstEventos.get(resp - 1).getNombreEvento(),
+                            idOlimpiada, idDeporte));
+
+                    System.out.print("\nDime la edad: ");
+                    int edad = scanner.nextInt();
+                    scanner.nextLine();
+
+                    do {
+                        System.out.println("\n==============================");
+                        System.out.println("    Selecciona la Medalla");
+                        System.out.println("==============================");
+                        System.out.println("1. Ninguna");
+                        System.out.println("2. Bronce");
+                        System.out.println("3. Plata");
+                        System.out.println("4. Oro");
+                        System.out.print("Selecciona el número: ");
+                        resp = scanner.nextInt();
+                        scanner.nextLine();
+                    } while (resp != 1 && resp != 2 && resp != 3 && resp != 4);
+
+                    String medalla = "Gold";
+                    switch (resp) {
+                        case 1:
+                            medalla = "NA";
+                            break;
+                        case 2:
+                            medalla = "Bronze";
+                            break;
+                        case 3:
+                            medalla = "Silver";
+                            break;
+                    }
+
+                    System.out.print("Dime el nombre de su equipo: ");
+                    String nombreEquipo = scanner.nextLine();
+                    System.out.print("Dime su abreviación: ");
+                    String abreviacion = scanner.nextLine();
+
+                    if (DaoEquipo.conseguirIdEquipo(nombreEquipo, abreviacion) == null) {
+                        DaoEquipo.aniadirEquipo(nombreEquipo, abreviacion);
+                    }
+
+                    int idEquipo = Integer.parseInt(DaoEquipo.conseguirIdEquipo(nombreEquipo, abreviacion));
+
+                    System.out.println("\n==============================");
+                    System.out.println("    Datos Finales de Participación");
+                    System.out.println("==============================");
+                    System.out.println("ID Evento: " + idEvento);
+                    System.out.println("ID Equipo: " + idEquipo);
+                    System.out.println("ID Deportista: " + idDeportista);
+
+                    try {
+                        DaoParticipacion.aniadirParticipacion(idDeportista, idEvento, idEquipo, edad, medalla);
+                        System.out.println("\nParticipación añadida correctamente.");
+                    } catch (Exception e) {
+                        System.out.println("\nError: Esa participación ya está en la base de datos.");
+                    }
+                    break;
                 case 6:
+                resp = 0;
+                System.out.println("\n==============================");
+                System.out.println("   Búsqueda de Deportista");
+                System.out.println("==============================");
+                System.out.print("Dime el nombre a buscar: ");
+                nombre = scanner.nextLine();
+                
+                lstDeportistas = DaoDeportista.findDeportistaName(nombre);
+                
+                if (lstDeportistas.size() > 0) {
+                    do {
+                        System.out.println("\n==============================");
+                        System.out.println("   Selección de Deportista");
+                        System.out.println("==============================");
+                        for (int i = 0; i < lstDeportistas.size(); i++) {
+                            System.out.println("   " + (i + 1) + ": " + lstDeportistas.get(i).getNombreDeportista());
+                        }
+                        System.out.print("Elige el número correspondiente: ");
+                        resp = scanner.nextInt();
+                        scanner.nextLine();
+                    } while (resp < 1 || resp > lstDeportistas.size());
+                
+                    deportista = lstDeportistas.get(resp - 1);
+                    idDeportista = Integer.parseInt(
+                        DaoDeportista.conseguirIdDeportista(
+                            deportista.getNombreDeportista(), 
+                            deportista.getSexo(), 
+                            deportista.getPeso(), 
+                            deportista.getAltura()
+                        )
+                    );
+                
+                    lstEventos = DaoEvento.listaModelosPorId(
+                        DaoParticipacion.getIdEvento(
+                            Integer.parseInt(
+                                DaoDeportista.conseguirIdDeportista(
+                                    lstDeportistas.get(resp - 1).getNombreDeportista(),
+                                    lstDeportistas.get(resp - 1).getSexo(),
+                                    lstDeportistas.get(resp - 1).getPeso(),
+                                    lstDeportistas.get(resp - 1).getAltura()
+                                )
+                            )
+                        )
+                    );
+                
+                    if (lstEventos.size() > 0) {
+                        do {
+                            System.out.println("\n==============================");
+                            System.out.println("   Selección de Evento");
+                            System.out.println("==============================");
+                            for (int i = 0; i < lstEventos.size(); i++) {
+                                System.out.println("   " + (i + 1) + ": " + lstEventos.get(i).getNombreEvento());
+                            }
+                            System.out.print("Elige el número correspondiente: ");
+                            resp = scanner.nextInt();
+                            scanner.nextLine();
+                        } while (resp < 1 || resp > lstEventos.size());
+                
+                        ModeloEvento evento = DaoEvento.createById(
+                            Integer.parseInt(
+                                DaoEvento.conseguirIdEvento(
+                                    lstEventos.get(resp - 1).getNombreEvento(),
+                                    Integer.parseInt(
+                                        DaoOlimpiada.conseguirIdOlimpiada(
+                                            lstEventos.get(resp - 1).getOlimpiada().getNombreOlimpiada(),
+                                            lstEventos.get(resp - 1).getOlimpiada().getAnio(),
+                                            lstEventos.get(resp - 1).getOlimpiada().getTemporada(),
+                                            lstEventos.get(resp - 1).getOlimpiada().getCiudad()
+                                        )
+                                    ),
+                                    Integer.parseInt(
+                                        DaoDeporte.conseguirIdDeporte(
+                                            lstEventos.get(resp - 1).getDeporte().getNombreDeporte()
+                                        )
+                                    )
+                                )
+                            )
+                        );
+                
+                        idEvento = Integer.parseInt(
+                            DaoEvento.conseguirIdEvento(
+                                evento.getNombreEvento(),
+                                Integer.parseInt(
+                                    DaoOlimpiada.conseguirIdOlimpiada(
+                                        evento.getOlimpiada().getNombreOlimpiada(),
+                                        evento.getOlimpiada().getAnio(),
+                                        evento.getOlimpiada().getTemporada(),
+                                        evento.getOlimpiada().getCiudad()
+                                    )
+                                ),
+                                Integer.parseInt(
+                                    DaoDeporte.conseguirIdDeporte(
+                                        evento.getDeporte().getNombreDeporte()
+                                    )
+                                )
+                            )
+                        );
+                
+                        DaoParticipacion.eliminarParticipacion(idDeportista, idEvento);
+                        System.out.println("\n==============================");
+                        System.out.println("   Participación Eliminada");
+                        System.out.println("==============================");
+                        System.out.println("La participación ha sido eliminada con éxito.");
+                    } else {
+                        System.out.println("\n==============================");
+                        System.out.println("   Sin Participaciones");
+                        System.out.println("==============================");
+                        System.out.println("Ese deportista no tiene participaciones registradas.");
+                    }
+                } else {
+                    System.out.println("\n==============================");
+                    System.out.println("   Deportista No Encontrado");
+                    System.out.println("==============================");
+                    System.out.println("No hay ningún deportista que contenga esa cadena de caracteres en el nombre.");
+                }
+                break;
+                
+                case 0:
                     System.out.println("Saliendo...");
                     break;
                 default:
                     System.out.println("Opción no disponible.");
                     break;
             }
-        } while (opcion != 6);
+        } while (opcion != 0);
 
         scanner.close();
     }
