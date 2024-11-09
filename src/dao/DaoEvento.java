@@ -123,4 +123,39 @@ public static ModeloEvento createById(int id) {
 		}
 		return null;
 	}
+	public static ArrayList<ModeloEvento> modelosByDeporteOlimpiada(int idDeporte, int idOlimpiada) {
+		ArrayList<ModeloEvento> lst = new ArrayList<>();
+		
+		String select = "SELECT nombre FROM Evento WHERE id_deporte=? AND id_olimpiada=?";
+		
+		try (Connection con = ConexionBBDD.getConnection();
+			PreparedStatement pstmt = con.prepareStatement(select)) {
+			
+			pstmt.setInt(1, idDeporte);
+			pstmt.setInt(2, idOlimpiada);
+			
+			try (ResultSet rs = pstmt.executeQuery()) {
+				while (rs.next()) {
+					// Creamos el modelo de evento
+					ModeloEvento evento = new ModeloEvento(
+							rs.getString("nombre"),
+							DaoDeporte.createDeporteModel(idDeporte),
+							DaoOlimpiada.createOlimpiadaModel(idOlimpiada)
+					);
+					
+					// Añadimos el evento si no está ya en la lista (verificando por referencia)
+					if (!lst.contains(evento)) {
+						lst.add(evento);
+					}
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return lst;
+	}
+
+
+
 }
