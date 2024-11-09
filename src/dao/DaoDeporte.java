@@ -4,12 +4,35 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import bbdd.ConexionBBDD;
 import model.ModeloDeporte;
 
 public class DaoDeporte {
     private static Connection connection;
+
+public static ArrayList<ModeloDeporte> listaDeportesPorOlimpiada(int idOlimpiada){
+		connection=ConexionBBDD.getConnection();
+		ArrayList<ModeloDeporte>lst=new ArrayList<ModeloDeporte>();
+		String select="SELECT id_deporte FROM Evento WHERE id_olimpiada=?";
+		try {
+			PreparedStatement pstmt;
+			pstmt=connection.prepareStatement(select);
+			pstmt.setInt(1, idOlimpiada);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				connection.commit();
+				ModeloDeporte deporte=DaoDeporte.createDeporteModel(rs.getInt("id_deporte"));
+				if(!lst.contains(deporte)) {
+					lst.add(deporte);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lst;
+	}
 
     public static int getDeporteId(String nombreDeporte) throws SQLException {
         String query = "SELECT id_deporte FROM Deporte WHERE nombre = ?";

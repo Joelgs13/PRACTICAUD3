@@ -33,6 +33,25 @@ public class DaoParticipacion {
 		return false;
 	}
 
+	public static ArrayList<String> darIdDeportista(int idEvento) {
+		connection=ConexionBBDD.getConnection();
+		String select="SELECT id_deportista FROM Participacion WHERE id_evento=?";
+		ArrayList<String> lst=new ArrayList<String>();
+		try {
+			PreparedStatement pstmt;
+			pstmt=connection.prepareStatement(select);
+			pstmt.setInt(1, idEvento);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				connection.commit();
+				lst.add(rs.getString("id_deportista"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lst;
+	}
+
 public static ModeloParticipacion crearModeloParticipacion(int idDeportista, int idEvento) {
     connection = ConexionBBDD.getConnection();
     String consulta = "SELECT id_equipo, edad, medalla FROM Participacion WHERE id_deportista=? AND id_evento=?";

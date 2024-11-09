@@ -3,6 +3,7 @@ package dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import bbdd.ConexionBBDD;
 import model.ModeloDeporte;
@@ -30,6 +31,29 @@ public class DaoEvento {
 		}
 	}
 	
+	public static ArrayList<ModeloEvento> crearListaModelosPorDeporteYOlimpiada(int idDeporte,int idOlimpiada) {
+		connection=ConexionBBDD.getConnection();
+		String select="SELECT nombre FROM Evento WHERE id_deporte=? AND id_olimpiada=?";
+		ArrayList<ModeloEvento>lst=new ArrayList<ModeloEvento>();
+		try {
+			PreparedStatement pstmt;
+			pstmt=connection.prepareStatement(select);
+			pstmt.setInt(1, idDeporte);
+			pstmt.setInt(2, idOlimpiada);
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()) {
+				connection.commit();
+				ModeloEvento evento=new ModeloEvento(rs.getString("nombre"),DaoDeporte.createDeporteModel(idDeporte),DaoOlimpiada.createOlimpiadaModel(idOlimpiada));
+				if(!lst.contains(evento)) {
+					lst.add(evento);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lst;	
+	}
+
 public static ModeloEvento createById(int id) {
     connection = ConexionBBDD.getConnection();
     String consulta = "SELECT nombre, id_deporte, id_olimpiada FROM Evento WHERE id_evento=?";

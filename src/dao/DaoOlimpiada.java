@@ -3,6 +3,7 @@ package dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import bbdd.ConexionBBDD;
 import model.ModeloOlimpiada;
@@ -26,6 +27,29 @@ public class DaoOlimpiada {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static ArrayList<ModeloOlimpiada> listaOlimpiadasPorTemporada(int temp){
+		ArrayList<ModeloOlimpiada> lst=new ArrayList<ModeloOlimpiada>();
+		String temporada="Winter";
+		if(temp==2) {
+			temporada="Summer";
+		}
+		connection=ConexionBBDD.getConnection();
+		String select="SELECT id_olimpiada FROM Olimpiada WHERE temporada=?";
+		try {
+			PreparedStatement pstmt;
+			pstmt=connection.prepareStatement(select);
+			pstmt.setString(1, temporada);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				connection.commit();
+				lst.add(DaoOlimpiada.createOlimpiadaModel(rs.getInt("id_olimpiada")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lst;
 	}
 	
 	public static String conseguirIdOlimpiada(String nombre, int anio,String temporada,String ciudad) {

@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Scanner;
 
 import bbdd.ConexionBBDD;
-import dao.DaoCrearTablaDocker;
-import dao.DaoDeportista;
-import dao.DaoParticipacion;
-import model.ModeloParticipacion;
+import dao.*;
+import model.*;
 
 public class MenuOlimpiadas {
     public static void main(String[] args) {
@@ -42,6 +40,97 @@ public class MenuOlimpiadas {
 
 
                     break;
+                case 3:
+                int resp = 0;
+                String temporada;
+                int idDeporte;
+                int idOlimpiada;
+                int idEvento;
+                
+                do {
+                    System.out.println("\n==============================");
+                    System.out.println("   Selecciona la Temporada:");
+                    System.out.println("1. Winter");
+                    System.out.println("2. Summer");
+                    System.out.println("==============================");
+                    resp = scanner.nextInt();
+                    scanner.nextLine();
+                } while (resp != 1 && resp != 2);
+                
+                ArrayList<ModeloOlimpiada> lstOlimpiada = DaoOlimpiada.listaOlimpiadasPorTemporada(resp);
+                
+                do {
+                    System.out.println("\n==============================");
+                    System.out.println("   Elige la Edición Olímpica:");
+                    System.out.println("==============================");
+                    for (int i = 0; i < lstOlimpiada.size(); i++) {
+                        System.out.println((i + 1) + ": " + lstOlimpiada.get(i).toString());
+                    }
+                    resp = scanner.nextInt();
+                    scanner.nextLine();
+                } while (resp < 1 || resp > lstOlimpiada.size());
+                
+                temporada = lstOlimpiada.get(resp - 1).getTemporada();
+                idOlimpiada = Integer.parseInt(DaoOlimpiada.conseguirIdOlimpiada(
+                        lstOlimpiada.get(resp - 1).getNombreOlimpiada(),
+                        lstOlimpiada.get(resp - 1).getAnio(),
+                        temporada, lstOlimpiada.get(resp - 1).getCiudad()));
+                
+                ArrayList<ModeloDeporte> lstDeporte = DaoDeporte.listaDeportesPorOlimpiada(idOlimpiada);
+                
+                do {
+                    System.out.println("\n==============================");
+                    System.out.println("   Elige el Deporte:");
+                    System.out.println("==============================");
+                    for (int i = 0; i < lstDeporte.size(); i++) {
+                        System.out.println((i + 1) + ": " + lstDeporte.get(i).toString());
+                    }
+                    resp = scanner.nextInt();
+                    scanner.nextLine();
+                } while (resp < 1 || resp > lstDeporte.size());
+                
+                idDeporte = Integer.parseInt(DaoDeporte.conseguirIdDeporte(lstDeporte.get(resp - 1).getNombreDeporte()));
+                ArrayList<ModeloEvento> lstEventos = DaoEvento.crearListaModelosPorDeporteYOlimpiada(idDeporte, idOlimpiada);
+                
+                do {
+                    System.out.println("\n==============================");
+                    System.out.println("   Elige el Evento:");
+                    System.out.println("==============================");
+                    for (int i = 0; i < lstEventos.size(); i++) {
+                        System.out.println((i + 1) + ": " + lstEventos.get(i).toString());
+                    }
+                    resp = scanner.nextInt();
+                    scanner.nextLine();
+                } while (resp < 1 || resp > lstEventos.size());
+                
+                idEvento = Integer.parseInt(DaoEvento.conseguirIdEvento(
+                        lstEventos.get(resp - 1).getNombreEvento(), idOlimpiada, idDeporte));
+                
+                System.out.println("\n==============================");
+                System.out.println("   Resumen Final:");
+                System.out.println("==============================");
+                System.out.println("   Temporada: " + temporada);
+                System.out.println("   Olimpiada: " + DaoOlimpiada.createOlimpiadaModel(idOlimpiada));
+                System.out.println("   Deporte: " + DaoDeporte.createDeporteModel(idDeporte));
+                System.out.println("   Evento: " + DaoEvento.createById(idEvento));
+                System.out.println("==============================");
+                
+                System.out.println("\n==============================");
+                System.out.println("   Deportistas Participantes:");
+                System.out.println("==============================");
+                
+                ArrayList<String> lstIdDeportistas = DaoParticipacion.darIdDeportista(idEvento);
+                for (String deportista : lstIdDeportistas) {
+                    ModeloParticipacion participacion = DaoParticipacion.crearModeloParticipacion(
+                            Integer.parseInt(deportista), idEvento);
+                    System.out.println("   " + participacion.toString());
+                }
+                
+                System.out.println("\n==============================");
+                System.out.println("   Fin de la consulta.");
+                System.out.println("==============================");
+                
+			break;
                 case 6:
                     System.out.println("Saliendo...");
                     break;
